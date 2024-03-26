@@ -19,7 +19,8 @@ public class Board {
         for (int row = 0; row < rows; row++){ // initialize all cells on board to empty (0) and status to not clicked (0)
             for (int col = 0; col < columns; col++){
                 gameBoard[row][col] = 0;
-                gameBoardStatus[row][col] = 1;
+                gameBoardStatus[row][col] = 0;
+                //gameBoardStatus[row][col] = 1; // SHOULD BE ZERO, IS 1 FOR DEBUG PURPOSES
             }
         }
 
@@ -34,6 +35,87 @@ public class Board {
 
             gameBoard[row][col] = 1; // 1 means mine is planted at cell
         }
+    }
+
+    // actions
+    public int click(int row, int col){ // click a cell on the board
+        gameBoardStatus[row][col] = 1; // set status of cell as clicked
+        
+        if (gameBoard[row][col] == 1){ // if the cell is a mine
+            return 0; // 0 means player clicked on mine and lost
+        }
+        else if (calculateSurroundingMines(row, col) == 0){ // if there are no mines surrounding the cell
+            // check immediate surrounding cells,
+            for (int r = row-1; r <= row+1; r++){ 
+                // if r outside of the gameboard
+                if (r >= rows){ 
+                    break;
+                }
+                if (r < 0){
+                    r = 0;
+                }
+
+                if (r != row){
+                    if (gameBoardStatus[r][col] == 0){ // if the cell hasnt already been clicked
+                        if (calculateSurroundingMines(r, col) == 0){ // and if the cell also has no surrounding mines
+                            click(r, col); // click it as well
+                        }
+                        else if (gameBoard[r][col] == 0){ // if it instead isnt a mine,
+                            gameBoardStatus[r][col] = 1; // set it as clicked
+                        }
+                    }
+                }
+            }
+            for (int c = col-1; c <= col+1; c++){
+                // if c is outside of the gameboard
+                if (c >= columns){
+                    break;
+                }
+                if (c < 0){
+                    c = 0;
+                }
+
+                if (c != col){
+                    if (gameBoardStatus[row][c] == 0){ // if the cell hasnt already been clicked
+                        if (calculateSurroundingMines(row, c) == 0){ // and if the cell also has no surrounding mines
+                            click(row, c); // click it as well
+                        }
+                        else if (gameBoard[row][c] == 0){ // if it instead isnt a mine,
+                            gameBoardStatus[row][c] = 1; // set it as clicked
+                        }
+                    }
+                }
+            }
+        }
+
+        return 1;
+    }
+    public int flag(int row, int col){ // flag a cell on the board as a mine
+        if (gameBoardStatus[row][col] == 1){ // if the cell has been clicked
+            return 0; // 0 means cell can't be flagged
+        }
+        else {
+            gameBoardStatus[row][col] = 2; // set status of cell as flagged
+        }
+        return 1; // 1 means cell is successfully flagged
+    }
+    public int maybeFlag(int row, int col){ // flag a cell on the board as a possible mine
+        if (gameBoardStatus[row][col] == 1){
+            return 0;
+        }
+        else {
+            gameBoardStatus[row][col] = 3; // set status of cell as maybe-flagged
+        }
+        return 1;
+    }
+    public int unflag(int row, int col){ // remove flag/maybe-flag status from cell
+        if (gameBoardStatus[row][col] == 1){
+            return 0; // cell can't be unflagged if already clicked
+        }
+        else {
+            gameBoardStatus[row][col] = 0; // set status of cell back to not clicked
+        }
+        return 1;
     }
 
     public int calculateSurroundingMines(int row, int col){ // calculate how many mines are surrounding a certain cell
@@ -67,7 +149,10 @@ public class Board {
     public int getCell(int row, int col){
         return gameBoard[row][col];
     }
-    public String getMineLocations(){ // get the game board but not the status of each cell, just mines
+    public int getCellStatus(int row, int col){
+        return gameBoardStatus[row][col];
+    }
+    public String getMineLocations(){ // get the game board but not the status of each cell, just mines. works like toString
         String str = "\t";
 
         for (int c = 0; c < columns; c++){

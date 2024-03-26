@@ -20,20 +20,21 @@ public class MinesweeperThing {
             usrInpt = usrInpt.toUpperCase();
         }
 
+        Board game = new Board(8, 8, 10); // default board bc java is a bitch and wont compile
         if (usrInpt.equals("E")){
-            Board game = new Board(8, 8, 10);
+            game = new Board(8, 8, 10);
 
             System.out.println("DEBUG:\n" + game.getMineLocations());
             System.out.println("DEBUG:\n" + game.toString());
         }
         else if (usrInpt.equals("M")){
-            Board game = new Board(16, 16, 40);
+            game = new Board(16, 16, 40);
 
             System.out.println("DEBUG:\n" + game.getMineLocations());
             System.out.println("DEBUG:\n" + game.toString());
         }
         else if (usrInpt.equals("H")){
-            Board game = new Board(16, 30, 99);
+            game = new Board(16, 30, 99);
 
             System.out.println("DEBUG:\n" + game.getMineLocations());
             System.out.println("DEBUG:\n" + game.toString());
@@ -42,71 +43,72 @@ public class MinesweeperThing {
             System.out.println("custom boards dont exist yet lol sorry");
         }
 
+        
+        boolean playContinue;
+        System.out.println(game.toString());
+        playContinue = play(true, game);
 
-        int action; // 0 = click, 1 = unflag, 2 = flag, 3 = maybe flag
+        while (playContinue){
+            System.out.println(game.toString());
+            playContinue = play(false, game);
+        }
+
+    }
+
+    public static boolean play(boolean firstTime, Board game){
         int col;
         int row;
-
-        System.out.println(game.toString());
-
-        System.out.println("Enter a cell's column and row, Ex: \"A 1\"");
+        int result;
+        String usrInpt;
+        
+        if (firstTime){
+            System.out.println("Enter a cell's column and row, Ex: \"A 1\""); 
+        }
+        else {
+            System.out.print("Enter cell: ");
+        }
         usrInpt = scan.nextLine();
-        col = (char)(usrInpt.substring(0, 1).toUpperCase());
-        row = (char)(usrInpt.substring(2, 3));
+        if (usrInpt.equals("END")){
+            return false;
+        }
+        else {
+            col = (usrInpt.substring(0, 1).toUpperCase().toCharArray())[0] - 65; // really convoluted way of converting the column char to an index
+            row = Integer.parseInt(usrInpt.substring(2));
+        }
 
         usrInpt = "";
         while ( !(usrInpt.equals("C") || usrInpt.equals("F") || usrInpt.equals("?") || usrInpt.equals("U")) ){
-            System.out.println("Enter the action you'd like to commit: [C]lick, [F]lag as mine, [?] Flag as possible mine, [U]nflag");
+            if (firstTime){
+                System.out.println("Enter the action you'd like to commit: [C]lick, [F]lag as mine, [?] Flag as possible mine, [U]nflag");
+            }
+            else {
+                System.out.print("[C]lick, [F]lag as mine, [?] Flag as possible mine, [U]nflag: ");
+            }
             usrInpt = scan.nextLine();
             usrInpt = usrInpt.toUpperCase();
             
-            if (usrInpt.equals("C")){
-                action = 0;
+            if (usrInpt.equals("END")){
+                return false;
+            }
+            else if (usrInpt.equals("C")){
+                result = game.click(row, col);
+                if (result == 0){
+                    return false;
+                }
             }
             else if (usrInpt.equals("F")){
-                action = 2;
+                game.flag(row, col);
             }
             else if (usrInpt.equals("?")){
-                action = 3;
+                game.maybeFlag(row, col);
             }
             else if (usrInpt.equals("U")){
-                action = 1;
+                game.unflag(row, col);
             }
         }
 
-        // (do something with Board object here)
-        
-        while (usrInpt != "END"){
-            System.out.println(game.toString());
-
-            System.out.print("Enter cell: ");
-            usrInpt = scan.nextLine();
-            col = (char)(usrInpt.substring(0, 1).toUpperCase());
-            row = (char)(usrInpt.substring(2, 3));
-
-            usrInpt = "";
-            while ( !(usrInpt.equals("C") || usrInpt.equals("F") || usrInpt.equals("?") || usrInpt.equals("U")) ){
-                System.out.println("[C]lick, [F]lag as mine, [?] Flag as possible mine, [U]nflag: ");
-                usrInpt = scan.nextLine();
-                usrInpt = usrInpt.toUpperCase();
-                
-                if (usrInpt.equals("C")){
-                    action = 0;
-                }
-                else if (usrInpt.equals("F")){
-                    action = 2;
-                }
-                else if (usrInpt.equals("?")){
-                    action = 3;
-                }
-                else if (usrInpt.equals("U")){
-                    action = 1;
-                }
-            }
-
-            // (do something with Board object here)
-        }
-        
-
+        return true;
     }
+        
+
 }
