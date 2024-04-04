@@ -19,7 +19,7 @@ public class Board {
         for (int row = 0; row < rows; row++){ // initialize all cells on board to empty (0) and status to not clicked (0)
             for (int col = 0; col < columns; col++){
                 gameBoard[row][col] = 0;
-                gameBoardStatus[row][col] = 0;
+                gameBoardStatus[row][col] = 1;
             }
         }
 
