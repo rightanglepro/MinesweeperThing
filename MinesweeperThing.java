@@ -23,17 +23,18 @@ public class MinesweeperThing {
         if (usrInpt.equals("E")){
             Board game = new Board(8, 8, 10);
 
+            System.out.println("DEBUG:\n" + game.getMineLocations());
             System.out.println("DEBUG:\n" + game.toString());
         }
         else if (usrInpt.equals("M")){
             Board game = new Board(16, 16, 40);
 
-            System.out.println("DEBUG:\n" + game.toString());
+            System.out.println("DEBUG:\n" + game.getMineLocations());
         }
         else if (usrInpt.equals("H")){
             Board game = new Board(16, 30, 99);
 
-            System.out.println("DEBUG:\n" + game.toString());
+            System.out.println("DEBUG:\n" + game.getMineLocations());
         }
         else if (usrInpt.equals("C")){
             System.out.println("custom boards dont exist yet lol sorry");
