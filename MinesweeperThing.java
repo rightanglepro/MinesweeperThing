@@ -6,7 +6,7 @@ public class MinesweeperThing {
 
     public static void main(String[] args) {
         System.out.println("Java Minesweeper Thing\n" + 
-                           "v0.0.1 Alpha Mar 11 2024\n" + 
+                           "v0.0.1 Beta\n" + 
                            "Right Angle Productions, 2024\n");
 
         String usrInpt = "A";
@@ -23,57 +23,66 @@ public class MinesweeperThing {
         Board game = new Board(8, 8, 10); // default board bc java is a bitch and wont compile
         if (usrInpt.equals("E")){
             game = new Board(8, 8, 10);
-
-            System.out.println("DEBUG:\n" + game.getMineLocations());
-            System.out.println("DEBUG:\n" + game.toString());
         }
         else if (usrInpt.equals("M")){
             game = new Board(16, 16, 40);
-
-            System.out.println("DEBUG:\n" + game.getMineLocations());
-            System.out.println("DEBUG:\n" + game.toString());
         }
         else if (usrInpt.equals("H")){
             game = new Board(16, 30, 99);
-
-            System.out.println("DEBUG:\n" + game.getMineLocations());
-            System.out.println("DEBUG:\n" + game.toString());
         }
         else if (usrInpt.equals("C")){
             System.out.println("custom boards dont exist yet lol sorry");
         }
 
         
-        boolean playContinue;
+        int playContinue; // 0 = lost game, 1 = continue, 2 = quit game, 3 = won game
         System.out.println(game.toString());
         playContinue = play(true, game);
 
-        while (playContinue){
+        while (playContinue == 1){
             System.out.println(game.toString());
             playContinue = play(false, game);
         }
 
+        if (playContinue == 0){ // game ended because player lost
+            game.showAllCells();
+            System.out.println(game.toString());
+            System.out.println("\nYou lost!");
+        }
+        else if (playContinue == 2){ // game ended bc player quit
+            System.out.println("\nGame has been ended.");
+        }
+        else if (playContinue == 3){ // game ended bc player won
+            System.out.println(game.toString());
+            System.out.println("\nYou won!");
+        }
+
     }
 
-    public static boolean play(boolean firstTime, Board game){
+    public static int play(boolean firstTime, Board game){
         int col;
         int row;
         int result;
         String usrInpt;
         
         if (firstTime){
-            System.out.println("Enter a cell's column and row, Ex: \"A 1\""); 
+            System.out.print("Enter a cell's column and row, Ex: \"A1\"\t"); 
         }
         else {
             System.out.print("Enter cell: ");
         }
         usrInpt = scan.nextLine();
+        System.out.println("");
         if (usrInpt.equals("END")){
-            return false;
+            return 2; // quit game
         }
         else {
             col = (usrInpt.substring(0, 1).toUpperCase().toCharArray())[0] - 65; // really convoluted way of converting the column char to an index
-            row = Integer.parseInt(usrInpt.substring(2));
+            row = Integer.parseInt(usrInpt.substring(1));
+
+            game.setSelectedCell(row, col);
+            System.out.println(game.toString()); // display gameboard with + in place of selected cell
+            game.setSelectedCell(-1, -1); // set gameboard's selected cell back to (-1,-1) (unselected)
         }
 
         usrInpt = "";
@@ -86,14 +95,15 @@ public class MinesweeperThing {
             }
             usrInpt = scan.nextLine();
             usrInpt = usrInpt.toUpperCase();
+            System.out.println("");
             
             if (usrInpt.equals("END")){
-                return false;
+                return 2; // quit game
             }
             else if (usrInpt.equals("C")){
                 result = game.click(row, col);
-                if (result == 0){
-                    return false;
+                if (result == 0){ // if player clicked on a mine
+                    return 0; // lost game
                 }
             }
             else if (usrInpt.equals("F")){
@@ -105,9 +115,13 @@ public class MinesweeperThing {
             else if (usrInpt.equals("U")){
                 game.unflag(row, col);
             }
+
+            if (game.isBoardCleared()){ // if game board has been cleared (all cells clicked or flagged)
+                return 3; // player wins
+            }
         }
 
-        return true;
+        return 1;
     }
         
 
